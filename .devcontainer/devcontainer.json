@@ -1,0 +1,61 @@
+{
+  "name": "Spring Boot TODO API",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspace",
+
+  // Dev Container内で実行するカスタマイズ
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "redhat.java",
+        "vmware.vscode-spring-boot",
+        "vscjava.vscode-gradle",
+        "ms-azuretools.vscode-docker",
+        "ckolkman.vscode-postgres",
+        "humao.rest-client",
+        "redhat.vscode-yaml",
+        "editorconfig.editorconfig"
+      ],
+      "settings": {
+        "java.server.launchMode": "LightWeight",
+        "java.configuration.runtimes": [
+          {
+            "name": "JavaSE-21",
+            "path": "/opt/java/openjdk",
+            "default": true
+          }
+        ],
+        "[java]": {
+          "editor.formatOnSave": false,
+          "editor.defaultFormatter": "redhat.java"
+        },
+        "java.completion.enabled": false,
+        "java.saveActions.organizeImports": false,
+        "redhat.telemetry.enabled": false,
+        "extensions.ignoreRecommendations": false
+      }
+    }
+  },
+
+  // 環境変数
+  "remoteEnv": {
+    "JAVA_HOME": "/opt/java/openjdk"
+  },
+
+  // ポートフォワーディング
+  "forwardPorts": [8080, 5432],
+  "portsAttributes": {
+    "8080": {
+      "label": "Spring Boot App",
+      "onAutoForward": "notify"
+    },
+    "5432": {
+      "label": "PostgreSQL",
+      "onAutoForward": "silent"
+    }
+  },
+
+  // コンテナ内でrootで実行しない
+  "remoteUser": "vscode"
+}

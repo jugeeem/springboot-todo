@@ -1,0 +1,12 @@
+package com.api.todos;
+
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+@SpringBootApplication
+public class SpringbootTodosApplication {
+
+    public static void main(String[] args) {
+        SpringApplication.run(SpringbootTodosApplication.class, args);
+    }
+}

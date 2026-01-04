@@ -1,0 +1,143 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '4.0.1'
+	id 'io.spring.dependency-management' version '1.1.7'
+	id 'checkstyle'
+	id 'com.diffplug.spotless' version '6.25.0'
+}
+
+group = 'com.api.todos'
+version = '0.0.1'
+description = 'Demo project for Spring Boot'
+
+java {
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	// Spring Boot Starters
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	developmentOnly 'org.springframework.boot:spring-boot-devtools'
+
+	// Database
+	runtimeOnly 'org.postgresql:postgresql'
+	testImplementation 'com.h2database:h2'
+
+	// JWT
+	implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
+	runtimeOnly 'io.jsonwebtoken:jjwt-impl:0.12.3'
+	runtimeOnly 'io.jsonwebtoken:jjwt-jackson:0.12.3'
+
+	// Jackson DataType (Java 8 Date/Time support)
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+
+	// Lombok
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok'
+
+	// Test
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'org.springframework.security:spring-security-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}
+
+// ============================================================
+// Checkstyle設定（静的解析）
+// ============================================================
+checkstyle {
+	toolVersion = '10.12.5'
+	configFile = file("${rootDir}/config/checkstyle/checkstyle.xml")
+	ignoreFailures = true
+	maxWarnings = 100
+	maxErrors = 100
+}
+
+checkstyleMain {
+	source = 'src/main/java'
+}
+
+checkstyleTest {
+	source = 'src/test/java'
+}
+
+// ============================================================
+// Spotless設定（コードフォーマット）
+// ============================================================
+spotless {
+	enforceCheck = false	// フォーマット違反があってもビルドを失敗させない
+
+	java {
+		target 'src/**/*.java'
+
+		// Google Java Formatを使用
+		googleJavaFormat('1.19.2').aosp().reflowLongStrings()
+
+		// インポート順序を整理
+		importOrder('java', 'javax', 'jakarta', 'org', 'com', '')
+
+		// 不要な空行を削除
+		removeUnusedImports()
+
+		// トレーリング空白を削除
+		trimTrailingWhitespace()
+
+		// ファイル末尾に改行を追加
+		endWithNewline()
+
+		// ライセンスヘッダー（オプション）
+		// licenseHeaderFile 'config/spotless/license-header.txt'
+	}
+
+	// build.gradleもフォーマット
+	groovyGradle {
+		target '*.gradle'
+		greclipse()
+		indentWithTabs()
+	}
+}
+
+// ============================================================
+// カスタムタスク：フォーマット＋静的解析を一括実行
+// ============================================================
+tasks.register('format') {
+	group = 'formatting'
+	description = 'コードフォーマットを実行（Spotless）'
+	dependsOn 'spotlessApply'
+}
+
+tasks.register('check-format') {
+	group = 'verification'
+	description = 'コードフォーマットをチェック（実際には変更しない）'
+	dependsOn 'spotlessCheck'
+}
+
+tasks.register('analyze') {
+	group = 'verification'
+	description = '静的解析を実行（Checkstyle）'
+	dependsOn 'checkstyleMain', 'checkstyleTest'
+}
+
+tasks.register('quality') {
+	group = 'verification'
+	description = 'フォーマットチェック＋静的解析を一括実行'
+	dependsOn 'spotlessCheck', 'checkstyleMain', 'checkstyleTest'
+}
