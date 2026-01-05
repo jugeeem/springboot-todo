@@ -27,23 +27,27 @@ services:
     container_name: springboot-todo-app
     stdin_open: true
     tty: true
-    command: bash /workspace/.devcontainer/start-app.sh
     ports:
       - "8080:8080"
+      - "5005:5005"
+    mem_limit: 2g
+    memswap_limit: 2g
+    cpu_shares: 1024
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/todos_db
       SPRING_DATASOURCE_USERNAME: todos_user
       SPRING_DATASOURCE_PASSWORD: todos_password
       SPRING_JPA_HIBERNATE_DDL_AUTO: validate
+      _JAVA_OPTIONS: "-Xmx1024m"
+      GRADLE_OPTS: "-Xmx768m -Xms384m"
     depends_on:
       db:
         condition: service_healthy
     networks:
       - springboot-network
     volumes:
-      - ..:/workspace
+      - ..:/app
       - gradle_cache:/home/vscode/.gradle
-    working_dir: /workspace/api
 
 volumes:
   postgres_data:

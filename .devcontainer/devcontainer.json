@@ -2,38 +2,13 @@
   "name": "Spring Boot TODO API",
   "dockerComposeFile": "docker-compose.yml",
   "service": "app",
-  "workspaceFolder": "/workspace",
+  "workspaceFolder": "/app",
 
-  // Dev Container内で実行するカスタマイズ
+  // Dev Container内で実行するカスタマイズ（拡張機能なし）
   "customizations": {
     "vscode": {
-      "extensions": [
-        "redhat.java",
-        "vmware.vscode-spring-boot",
-        "vscjava.vscode-gradle",
-        "ms-azuretools.vscode-docker",
-        "ckolkman.vscode-postgres",
-        "humao.rest-client",
-        "redhat.vscode-yaml",
-        "editorconfig.editorconfig"
-      ],
-      "settings": {
-        "java.server.launchMode": "LightWeight",
-        "java.configuration.runtimes": [
-          {
-            "name": "JavaSE-21",
-            "path": "/opt/java/openjdk",
-            "default": true
-          }
-        ],
-        "[java]": {
-          "editor.formatOnSave": false,
-          "editor.defaultFormatter": "redhat.java"
-        },
-        "java.completion.enabled": false,
-        "java.saveActions.organizeImports": false,
-        "redhat.telemetry.enabled": false,
-        "extensions.ignoreRecommendations": false
+      "devContainers": {
+        "cacheMountSource": "devcontainer-cache"
       }
     }
   },
@@ -44,18 +19,35 @@
   },
 
   // ポートフォワーディング
-  "forwardPorts": [8080, 5432],
+  "forwardPorts": [8080, 5436],
   "portsAttributes": {
     "8080": {
       "label": "Spring Boot App",
       "onAutoForward": "notify"
     },
-    "5432": {
+    "5436": {
       "label": "PostgreSQL",
       "onAutoForward": "silent"
     }
   },
 
+  // コンテナメモリ設定
+  "containerEnv": {
+    "VSCODE_SERVER_MEMORY_LIMIT": "2048"
+  },
+
   // コンテナ内でrootで実行しない
-  "remoteUser": "vscode"
+  "remoteUser": "vscode",
+
+  // VS Code拡張キャッシュをスキップ
+  "otherPortsAttributes": {
+    "onAutoForward": "silent"
+  },
+
+  // コンテナ起動後の初期化コマンド（初回のみ）
+  "postCreateCommand": "echo 'Dev Container setup complete.'",
+
+  // コンテナ起動時の自動実行コマンド（毎回）
+  // Spring Bootをバックグラウンドで起動
+  "postStartCommand": "bash -c 'cd /app/api && nohup ./gradlew bootRun > /tmp/spring-boot.log 2>&1 & disown'"
 }

@@ -14,8 +14,8 @@ RUN apt-get update && apt-get install -y \
 RUN useradd -m -s /bin/bash vscode
 
 # ワークスペースディレクトリを作成し、vsCodeユーザーに所有権を付与
-RUN mkdir -p /workspace && \
-    chown -R vscode:vscode /workspace
+RUN mkdir -p /app && \
+    chown -R vscode:vscode /app
 
 # vscode ユーザーのホームディレクトリとGradleキャッシュを準備
 RUN mkdir -p /home/vscode/.gradle && \
@@ -41,7 +41,7 @@ ENV JAVA_HOME=/opt/java/openjdk \
 # Java インストール位置を検証
 RUN java -version && test -d "${JAVA_HOME}" && echo "JAVA_HOME is correctly set to ${JAVA_HOME}"
 
-WORKDIR /workspace
+WORKDIR /app
 
 EXPOSE 8080 5005
 

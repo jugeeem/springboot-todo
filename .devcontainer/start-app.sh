@@ -1,38 +1,17 @@
 #!/bin/bash
 
-# Spring Boot アプリケーション起動スクリプト
-# Dev Container の postStartCommand から呼び出される
+# Spring Boot アプリケーション起動スクリプト（非推奨）
+# 注意：このスクリプトはもはや使用されていません。
+# 代わりに docker-compose.yml で直接 gradlew bootRun を実行してください。
+#
+# 理由：
+# 1. バックグラウンド実行によりコンテナが終了してしまう
+# 2. ログがコンテナコンソールに出力されない
+# 3. 起動確認の信頼性が低い
+#
+# 新しい起動方法：
+# docker-compose.yml の app サービスで直接実行：
+# command: bash -c "cd /workspace/api && ./gradlew bootRun"
 
-set -e
-
-# ワークスペースに移動
-cd /workspace/api
-
-# ログディレクトリ作成
-mkdir -p /tmp/logs
-
-# Gradle メモリ最適化環境変数設定
-export _JAVA_OPTIONS="-Xmx1024m"
-export GRADLE_OPTS="-Xmx768m -Xms384m"
-
-# アプリケーション起動
-echo "Starting Spring Boot application..."
-./gradlew bootRun > /tmp/logs/bootrun.log 2>&1 &
-
-# PID を記録
-echo $! > /tmp/app.pid
-
-# 起動確認（最大60秒待機）
-echo "Waiting for application to start..."
-for i in {1..60}; do
-  # ブートログから "Tomcat started" を確認
-  if grep -q "Tomcat started on port 8080" /tmp/logs/bootrun.log 2>/dev/null; then
-    echo "✅ Application started successfully"
-    exit 0
-  fi
-  echo "Attempt $i/60..."
-  sleep 1
-done
-
-echo "⚠️ Application may not have started. Check logs: docker exec springboot-todo-app tail -f /tmp/logs/bootrun.log"
+echo "Warning: This script is deprecated. Use 'docker-compose up' to start the app."
 exit 0

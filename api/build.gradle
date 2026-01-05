@@ -88,11 +88,11 @@ spotless {
 	java {
 		target 'src/**/*.java'
 
-		// Google Java Formatを使用
-		googleJavaFormat('1.19.2').aosp().reflowLongStrings()
+		// Google Java Format 1.33.0（Java 21対応）
+		googleJavaFormat('1.33.0').aosp().reflowLongStrings()
 
 		// インポート順序を整理
-		importOrder('java', 'javax', 'jakarta', 'org', 'com', '')
+		importOrder('java', 'javax', 'jakarta', 'com', 'org', '')
 
 		// 不要な空行を削除
 		removeUnusedImports()
